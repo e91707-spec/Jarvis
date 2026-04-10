@@ -284,13 +284,23 @@ class JarvisWebApp {
                     messageText.textContent = currentText + newMessage + '\n';
                 }
             } else if (data.type === 'complete') {
-                // Finalize the message
+                // Finalize the message in place without reloading
                 streamingMessage.classList.remove('streaming');
                 this.setProcessingState(false);
                 this.currentSessionId = null;
                 
-                // Reload chat to get saved messages
-                this.loadChat(this.currentChatId);
+                // Update the message ID to make it permanent
+                streamingMessage.id = '';
+                
+                // Use the final text from backend if provided, otherwise use current text
+                const finalText = data.message || messageText.textContent;
+                messageText.textContent = finalText;
+                
+                // Update copy button to use the final text
+                const copyBtn = streamingMessage.querySelector('.copy-btn');
+                if (copyBtn) {
+                    copyBtn.setAttribute('onclick', `app.copyToClipboard('${this.escapeHtml(finalText)}')`);
+                }
             } else if (data.type === 'error') {
                 messageText.textContent = data.message;
                 streamingMessage.classList.remove('streaming');

@@ -43,10 +43,14 @@ def run_agent_task(task, session_id):
             creationflags=0x08000000
         )
         
+        # Collect all output for saving
+        all_output = []
+        
         # Read output line by line and emit to client
         for line in process.stdout:
             line_content = line.rstrip('\n\r')
             if line_content.strip():
+                all_output.append(line_content)
                 socketio.emit('agent_response', {
                     'session_id': session_id,
                     'message': line_content,
@@ -55,10 +59,23 @@ def run_agent_task(task, session_id):
         
         process.wait()
         
-        # Signal completion
+        # Get the chat ID and save the accumulated response
+        if session_id in ACTIVE_SESSIONS:
+            chat_id = ACTIVE_SESSIONS[session_id]
+            chats = load_chats()
+            if chat_id in chats:
+                final_text = '\n'.join(all_output)
+                chats[chat_id]["messages"].append({
+                    "sender": "Agent",
+                    "text": final_text,
+                    "timestamp": datetime.now().isoformat()
+                })
+                save_chats(chats)
+        
+        # Signal completion with the final text
         socketio.emit('agent_response', {
             'session_id': session_id,
-            'message': '',
+            'message': '\n'.join(all_output),
             'type': 'complete'
         })
         
