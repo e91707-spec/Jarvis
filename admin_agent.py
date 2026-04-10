@@ -9,6 +9,7 @@ import subprocess
 import glob
 import threading
 import time
+import platform
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -234,15 +235,22 @@ def execute_file(filepath):
 def run_web_search(query):
     """Hand off web search to browser agent"""
     print(f"Handing off to browser agent for web search: {query}", flush=True)
+    subprocess_kwargs = {
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.STDOUT,
+        "text": True,
+        "encoding": "utf-8",
+        "bufsize": 1,
+        "cwd": "C:\\container"
+    }
+    
+    # Add creationflags only on Windows
+    if platform.system() == "Windows":
+        subprocess_kwargs["creationflags"] = 0x08000000
+    
     process = subprocess.Popen(
         ["python", "-u", "ai_browser_native.py", query],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="utf-8",
-        bufsize=1,
-        cwd="C:\\container",
-        creationflags=0x08000000
+        **subprocess_kwargs
     )
     for line in process.stdout:
         line = line.strip()

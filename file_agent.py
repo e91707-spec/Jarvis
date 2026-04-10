@@ -1,7 +1,9 @@
 import sys
 import os
+import subprocess
 import json
-import httpx
+import platform
+from pathlib import Path
 import asyncio
 import re
 import subprocess
@@ -104,21 +106,29 @@ def delete_file(filename):
 
 def run_browser_task(task):
     print(f"Handing off to browser agent: {task}", flush=True)
+    
+    # Cross-platform subprocess creation
+    subprocess_kwargs = {
+        "stdout": subprocess.PIPE,
+        "stderr": subprocess.STDOUT,
+        "text": True,
+        "encoding": "utf-8",
+        "bufsize": 1,
+        "cwd": "C:\\container"
+    }
+    
+    # Add creationflags only on Windows
+    if platform.system() == "Windows":
+        subprocess_kwargs["creationflags"] = 0x08000000
+    
     process = subprocess.Popen(
         ["python", "-u", "ai_browser_native.py", task],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="utf-8",
-        bufsize=1,
-        cwd="C:\\container",
-        creationflags=0x08000000
+        **subprocess_kwargs
     )
     for line in process.stdout:
         line = line.strip()
         if line:
             print(line, flush=True)
-    process.wait()
 
 async def ask_ollama(messages):
     print("Thinking...", flush=True)

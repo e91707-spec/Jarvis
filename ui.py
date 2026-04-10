@@ -8,6 +8,7 @@ import json
 import os
 import math
 from datetime import datetime
+import platform
 
 CHATS_FILE = "C:\\container\\chats.json"
 
@@ -254,15 +255,22 @@ def run_task(task):
         print(f"DEBUG: Starting execution with task: {task}", flush=True)
 
         try:
-            # Simple subprocess execution without stdin for now
+            # Cross-platform subprocess execution
+            subprocess_kwargs = {
+                "stdout": subprocess.PIPE,
+                "stderr": subprocess.STDOUT,
+                "text": True,
+                "bufsize": 0,  # Unbuffered output
+                "cwd": "C:\\container"
+            }
+            
+            # Add creationflags only on Windows
+            if platform.system() == "Windows":
+                subprocess_kwargs["creationflags"] = 0x08000000
+            
             process = subprocess.Popen(
                 ["python", "-u", script, task],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=0,  # Unbuffered output
-                cwd="C:\\container",
-                creationflags=0x08000000
+                **subprocess_kwargs
             )
             
             print("DEBUG: Subprocess started", flush=True)

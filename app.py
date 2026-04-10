@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 import uuid
 import sys
+import platform
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'jarvis-web-interface-secret-key'
@@ -33,14 +34,22 @@ def run_agent_task(task, session_id):
         # Use brains.py for intelligent routing
         script = "brains.py"
         
+        # Cross-platform subprocess creation
+        subprocess_kwargs = {
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.STDOUT,
+            "text": True,
+            "bufsize": 0,
+            "cwd": "C:\\container"
+        }
+        
+        # Add creationflags only on Windows
+        if platform.system() == "Windows":
+            subprocess_kwargs["creationflags"] = 0x08000000
+        
         process = subprocess.Popen(
             ["python", "-u", script, task],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=0,
-            cwd="C:\\container",
-            creationflags=0x08000000
+            **subprocess_kwargs
         )
         
         # Collect all output for saving

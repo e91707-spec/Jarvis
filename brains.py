@@ -7,6 +7,7 @@ import re
 import fnmatch
 import subprocess
 import glob
+import platform
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -14,6 +15,16 @@ sys.stdout.reconfigure(encoding='utf-8')
 WORKSPACE = "C:\\container\\workspace"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MODEL = "nous-hermes2:10.7b"
+
+def create_subprocess(*args, **kwargs):
+    """Cross-platform subprocess creation"""
+    subprocess_kwargs = kwargs.copy()
+    
+    # Add creationflags only on Windows
+    if platform.system() == "Windows":
+        subprocess_kwargs.setdefault("creationflags", 0x08000000)
+    
+    return subprocess.Popen(*args, **subprocess_kwargs)
 
 # Detect all available drives on Windows
 def get_all_drives():
@@ -230,15 +241,13 @@ async def run_admin_agent(task):
 
     # Launch admin_agent.py as subprocess
     try:
-        process = subprocess.Popen(
+        process = create_subprocess(
             ["python", "-u", "admin_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
             encoding="utf-8",
             bufsize=1,
-            cwd="C:\\container",
-            creationflags=0x08000000
+            cwd="C:\\container"
         )
         
         output_lines = []
@@ -262,7 +271,7 @@ async def run_admin_agent(task):
             elif confirmation_result:
                 print("Confirmation received. Executing file...", flush=True)
                 try:
-                    subprocess.Popen([str(filepath)], cwd=str(Path(filepath).parent))
+                    create_subprocess([str(filepath)], cwd=str(Path(filepath).parent))
                     print(f"Successfully executed '{Path(filepath).name}'")
                 except Exception as e:
                     print(f"Error executing file: {str(e)}")
@@ -284,15 +293,13 @@ async def run_file_agent(task):
     
     # Launch file_agent.py
     try:
-        process = subprocess.Popen(
+        process = create_subprocess(
             ["python", "-u", "file_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
             encoding="utf-8",
             bufsize=1,
-            cwd="C:\\container",
-            creationflags=0x08000000
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
@@ -308,15 +315,13 @@ async def run_browser_agent(task):
     
     # Launch browser_agent.py
     try:
-        process = subprocess.Popen(
+        process = create_subprocess(
             ["python", "-u", "ai_browser_native.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
             encoding="utf-8",
             bufsize=1,
-            cwd="C:\\container",
-            creationflags=0x08000000
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
@@ -332,15 +337,13 @@ async def run_chat_agent(task):
     
     # Launch chat_agent.py
     try:
-        process = subprocess.Popen(
+        process = create_subprocess(
             ["python", "-u", "chat_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
             encoding="utf-8",
             bufsize=1,
-            cwd="C:\\container",
-            creationflags=0x08000000
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
@@ -381,7 +384,7 @@ async def main():
                 if filepath:
                     print("Confirmation received. Executing file...", flush=True)
                     try:
-                        subprocess.Popen([str(filepath)], cwd=str(Path(filepath).parent))
+                        create_subprocess([str(filepath)], cwd=str(Path(filepath).parent))
                         print(f"Successfully executed '{Path(filepath).name}'")
                     except Exception as e:
                         print(f"Error executing file: {str(e)}")
