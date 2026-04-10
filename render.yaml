@@ -1,5 +1,5 @@
 services:
-  # Web Service
+  # Web Service - Standalone File-Free Version
   - type: web
     name: jarvis-web
     env: python
