@@ -33,11 +33,11 @@ def check_prerequisites():
     # Check if Docker is installed (optional)
     try:
         run_command("docker --version")
-        print("✓ Docker is installed")
+        print("[OK] Docker is installed")
     except:
-        print("⚠ Docker is not installed (optional for some deployment methods)")
+        print("[!] Docker is not installed (optional for some deployment methods)")
     
-    print("✓ Prerequisites check complete")
+    print("[OK] Prerequisites check complete")
 
 def setup_git_repo():
     """Initialize Git repository if not already done"""
@@ -46,9 +46,9 @@ def setup_git_repo():
         run_command("git init")
         run_command("git add .")
         run_command('git commit -m "Initial commit: Jarvis Web Interface"')
-        print("✓ Git repository initialized")
+        print("[OK] Git repository initialized")
     else:
-        print("✓ Git repository already exists")
+        print("[OK] Git repository already exists")
 
 def deploy_heroku():
     """Deploy to Heroku"""
@@ -81,7 +81,7 @@ def deploy_heroku():
     
     # Open the app
     run_command("heroku open")
-    print("✓ Deployed to Heroku successfully!")
+    print("[OK] Deployed to Heroku successfully!")
     return True
 
 def deploy_railway():
@@ -120,7 +120,7 @@ def deploy_docker():
     print("Starting Docker container...")
     run_command("docker run -d -p 5000:5000 --name jarvis-web-container jarvis-web")
     
-    print("✓ Docker container is running!")
+    print("[OK] Docker container is running!")
     print("Access your app at: http://localhost:5000")
     return True
 
@@ -134,7 +134,7 @@ def deploy_docker_compose():
     # Start containers
     run_command("docker-compose up -d")
     
-    print("✓ Docker Compose services are running!")
+    print("[OK] Docker Compose services are running!")
     print("Access your app at: http://localhost:5000")
     return True
 
@@ -170,7 +170,7 @@ def create_github_repo():
         run_command(f"git remote add origin {repo_url}")
         run_command("git branch -M main")
         run_command(f"git push -u origin main")
-        print(f"✓ Repository created: {repo_url}")
+        print(f"[OK] Repository created: {repo_url}")
         return True
     else:
         print(f"Error creating repository: {response.text}")
@@ -178,7 +178,7 @@ def create_github_repo():
 
 def main():
     """Main deployment menu"""
-    print("🚀 Jarvis Web Interface Deployment Tool")
+    print("Jarvis Web Interface Deployment Tool")
     print("=" * 50)
     
     check_prerequisites()
