@@ -20,6 +20,11 @@ def create_subprocess(*args, **kwargs):
     """Cross-platform subprocess creation"""
     subprocess_kwargs = kwargs.copy()
     
+    # Add default encoding parameters to prevent Unicode errors
+    subprocess_kwargs.setdefault("text", True)
+    subprocess_kwargs.setdefault("encoding", "utf-8")
+    subprocess_kwargs.setdefault("errors", "replace")
+    
     # Add creationflags only on Windows
     if platform.system() == "Windows":
         subprocess_kwargs.setdefault("creationflags", 0x08000000)
@@ -104,6 +109,8 @@ def request_execution_confirmation(task, filepath):
             ["python", "verify_agent.py", "confirm_execution", filepath, task],
             text=True,
             capture_output=True,
+            encoding="utf-8",
+            errors="replace",
             cwd="C:\\container"
         )
         if process.returncode == 2:
@@ -119,23 +126,33 @@ def request_execution_confirmation(task, filepath):
         return False
 
 def handle_execution_confirmation_response(response):
-    """Handle user's execution confirmation response using verify_agent.py"""
-    try:
-        process = subprocess.run(
-            ["python", "verify_agent.py", "execution_response", response],
-            text=True,
-            capture_output=True,
-            cwd="C:\\container"
-        )
-        
-        if process.returncode == 0:
-            # Extract the filepath from output
-            for line in process.stdout.splitlines():
-                if line.strip().startswith("EXECUTION_FILE:"):
-                    return line.strip().replace("EXECUTION_FILE:", "", 1).strip()
+    """Handle user's execution confirmation response directly"""
+    context_file = "C:\\container\\confirmation_context.json"
+    if not os.path.exists(context_file):
+        print("No pending execution confirmation found.", flush=True)
         return None
+    
+    try:
+        with open(context_file, 'r') as f:
+            context = json.load(f)
+        
+        if context.get('type') != 'execution':
+            print("No pending execution confirmation found.", flush=True)
+            return None
+        
+        response = response.strip().lower()
+        if response in ['yes', 'y']:
+            print("Execution confirmation received.", flush=True)
+            # Clear the context
+            os.remove(context_file)
+            return context['filepath']
+        else:
+            print("Execution cancelled by user.", flush=True)
+            # Clear the context
+            os.remove(context_file)
+            return None
     except Exception as e:
-        print(f"Error handling execution confirmation response: {str(e)}", flush=True)
+        print(f"Error handling execution confirmation: {str(e)}", flush=True)
         return None
 
 def search_all_drives(pattern):

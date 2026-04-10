@@ -39,6 +39,8 @@ def run_agent_task(task, session_id):
             "stdout": subprocess.PIPE,
             "stderr": subprocess.STDOUT,
             "text": True,
+            "encoding": "utf-8",
+            "errors": "replace",
             "bufsize": 0,
             "cwd": "C:\\container"
         }

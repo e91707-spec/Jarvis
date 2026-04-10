@@ -77,7 +77,7 @@ def get_execution_confirmation(filepath, task):
     print(f"Are you sure you want to execute '{Path(filepath).name}'?", flush=True)
     print(f"Please reply with 'yes' to confirm execution or 'no' to cancel.", flush=True)
     
-    # Save context for the confirmation
+    # Always save context for the confirmation in chat mode
     context = {
         "filepath": filepath,
         "task": task,
@@ -130,7 +130,7 @@ if len(sys.argv) > 1:
             filepath = sys.argv[2]
             task = " ".join(sys.argv[3:]) if len(sys.argv) > 3 else ""
             get_execution_confirmation(filepath, task)
-            # Pending confirmation: user must reply later through chat
+            # Always pending: user must reply through chat
             sys.exit(2)
         else:
             print("Missing filepath for execution confirmation.", flush=True)

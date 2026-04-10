@@ -13,7 +13,7 @@ from pathlib import Path
 def run_command(command, check=True):
     """Run a command and return the result"""
     print(f"Running: {command}")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if check and result.returncode != 0:
         print(f"Error: {result.stderr}")
         sys.exit(1)

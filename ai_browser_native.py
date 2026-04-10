@@ -18,20 +18,23 @@ Available actions:
 { "action": "done", "result": "your full answer here" }
 
 RULES:
-1. ALWAYS start by doing: goto https://duckduckgo.com/?q=search+terms+here
+1. Always start by doing: goto https://duckduckgo.com/?q=search+terms+here
 2. After seeing search results, pick ONE good link and goto it directly using the full URL from the links list
 3. After reading a page, if you have enough info use done with a complete answer
 4. If you need more info, goto another URL
-5. NEVER use click or type - only use goto and done
-6. NEVER go to YouTube, Steam, Reddit or social media
+5. Never use click or type - only use goto and done
+6. Never go to YouTube, Steam, Reddit or social media
 7. When you use done, write a full detailed answer in plain English"""
 
 def read_file(filename):
     path = os.path.join(WORKSPACE, filename)
-    if not os.path.exists(path):
-        return f"File {filename} not found in workspace"
-    with open(path, "r") as f:
-        return f.read()
+    try:
+        if not os.path.exists(path):
+            return f"File {filename} not found in workspace"
+        with open(path, "r", encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        return f"Error reading file {filename}: {str(e)}"
 
 def write_file(filename, content):
     path = os.path.join(WORKSPACE, filename)

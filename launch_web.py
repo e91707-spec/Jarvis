@@ -18,7 +18,7 @@ def main():
     
     # Install requirements
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], encoding="utf-8", errors="replace")
         print("Dependencies installed successfully!")
     except subprocess.CalledProcessError as e:
         print(f"Error installing dependencies: {e}")
@@ -33,7 +33,7 @@ def main():
     
     # Start the Flask app
     try:
-        subprocess.call([sys.executable, "app.py"])
+        subprocess.call([sys.executable, "app.py"], encoding="utf-8", errors="replace")
     except KeyboardInterrupt:
         print("\nShutting down web server...")
     except Exception as e:

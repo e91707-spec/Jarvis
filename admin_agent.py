@@ -8,6 +8,8 @@ import asyncio
 import httpx
 import glob
 import threading
+import fnmatch
+import re
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -237,6 +239,7 @@ def run_web_search(query):
         "stderr": subprocess.STDOUT,
         "text": True,
         "encoding": "utf-8",
+        "errors": "replace",
         "bufsize": 1,
         "cwd": "C:\\container"
     }
@@ -337,13 +340,37 @@ async def run_admin_task(task):
                 if any(word in task.lower() for word in ["execute", "run", "launch", "start"]):
                     exe_candidates = [line.strip() for line in result.splitlines() if line.strip().lower().endswith('.exe')]
                     if exe_candidates:
-                        target_name = os.path.basename(pattern).lower() if pattern else None
+                        # Extract the target executable name from the task
+                        target_name = None
+                        task_lower = task.lower()
+                        
+                        # Look for .exe filename in the task
+                        words = task_lower.split()
+                        for word in words:
+                            if '.exe' in word:
+                                target_name = word.replace('.exe', '').strip()
+                                break
+                        
+                        # If no .exe found, try to extract from pattern
+                        if not target_name and pattern:
+                            target_name = os.path.basename(pattern).lower().replace('.exe', '').strip()
+                        
                         chosen = None
                         if target_name:
+                            # First try exact match
                             for exe in exe_candidates:
-                                if target_name in os.path.basename(exe).lower():
+                                exe_name = os.path.basename(exe).lower().replace('.exe', '')
+                                if exe_name == target_name:
                                     chosen = exe
                                     break
+                            
+                            # If no exact match, try partial match
+                            if not chosen:
+                                for exe in exe_candidates:
+                                    if target_name in os.path.basename(exe).lower():
+                                        chosen = exe
+                                        break
+                        
                         if not chosen:
                             chosen = exe_candidates[0]
                         print(f"Auto-selected executable for execution: {chosen}", flush=True)

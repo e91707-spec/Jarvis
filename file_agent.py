@@ -113,6 +113,7 @@ def run_browser_task(task):
         "stderr": subprocess.STDOUT,
         "text": True,
         "encoding": "utf-8",
+        "errors": "replace",
         "bufsize": 1,
         "cwd": "C:\\container"
     }
