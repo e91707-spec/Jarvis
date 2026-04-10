@@ -4,43 +4,126 @@ A modern web-based AI assistant interface that replaces original Tkinter UI with
 
 ## Features
 
-- **Web-based Interface**: Access from any device with a browser
-- **Real-time Chat**: WebSocket-powered streaming responses
-- **Modern UI**: Dark theme matching original design
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Chat Persistence**: Saves conversations across sessions
-- **Agent Integration**: Full compatibility with existing backend agents
+- 🌐 **Web-based Interface**: Access from any device with a browser
+- 💬 **Real-time Chat**: WebSocket-powered streaming responses
+- 🎨 **Modern UI**: Dark theme matching original design
+- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
+- 💾 **Chat Persistence**: Saves conversations across sessions
+- 🔍 **Agent Integration**: Full compatibility with existing backend agents
 
 ## Quick Start
 
-1. **Install Dependencies**
+### Local Development
+
+1. **Clone and Setup**
+   ```bash
+   git clone https://github.com/e91707-spec/Jarvis.git
+   cd Jarvis
+   ```
+
+2. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run Locally**
+3. **Run Locally**
+   ```bash
+   python launch_web.py
+   ```
+   Or directly:
    ```bash
    python app.py
    ```
 
-3. **Access**
+4. **Access**
    Open http://localhost:5000 in your browser
 
-## Deployment
+### Docker Deployment
 
-### Railway (Recommended)
-- Go to railway.app → Deploy from GitHub
-- Select Jarvis repository
+1. **Build and Run**
+   ```bash
+   docker-compose up -d
+   ```
 
-### Render
-- Go to render.com → New Web Service
-- Connect Jarvis repository
-- Build: `pip install -r requirements.txt`
-- Start: `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app`
+2. **Access**
+   Open http://localhost:5000 in your browser
 
-### Heroku
-- `heroku create app-name`
-- `git push heroku main`
+## Deployment Options
+
+### 1. Railway (Easiest - Free)
+
+1. **Create GitHub Repository**
+   ```bash
+   # Go to GitHub.com → New repository → name it "jarvis-web"
+   # Then run these commands:
+   git remote add origin https://github.com/YOUR_USERNAME/jarvis-web.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+2. **Deploy to Railway**
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your "jarvis-web" repository
+   - Railway will automatically build and deploy
+   - Your app will be live at `https://your-app-name.railway.app`
+
+### 2. Render (Free)
+
+1. **Push to GitHub** (same as above)
+
+2. **Deploy to Render**
+   - Go to [render.com](https://render.com)
+   - Click "New" → "Web Service"
+   - Connect your GitHub repository
+   - Use these settings:
+     - Build Command: `pip install -r requirements.txt`
+     - Start Command: `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app`
+     - Instance Type: Free
+
+### 3. Heroku (Free)
+
+1. **Create Heroku App**
+   ```bash
+   heroku create your-app-name
+   ```
+
+2. **Deploy**
+   ```bash
+   git push heroku main
+   ```
+
+3. **Access**
+   Your app will be available at `https://your-app-name.herokuapp.com`
+
+### 4. VPS/Dedicated Server
+
+1. **Install Docker**
+   ```bash
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sh get-docker.sh
+   ```
+
+2. **Deploy**
+   ```bash
+   git clone https://github.com/e91707-spec/Jarvis.git
+   cd Jarvis
+   docker-compose up -d
+   ```
+
+3. **Setup Reverse Proxy (Optional)**
+   Use Nginx or Apache to proxy to port 5000
+
+## Environment Variables
+
+Create a `.env` file for local development:
+
+```env
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-here
+OLLAMA_URL=http://localhost:11434/api/chat
+MODEL=nous-hermes2:10.7b
+```
 
 ## File Structure
 
@@ -68,6 +151,8 @@ Jarvis/
 
 ## Configuration
 
+### Backend Agents
+
 The web interface integrates with the existing backend agents:
 
 - **brains.py**: Intelligent request routing
@@ -75,6 +160,48 @@ The web interface integrates with the existing backend agents:
 - **file_agent.py**: Workspace file operations  
 - **ai_browser_native.py**: Web searches
 - **chat_agent.py**: General conversation
+
+### Chat Storage
+
+Chats are stored in `chats.json` in the project root. For production, consider:
+
+- Database storage (PostgreSQL, MongoDB)
+- Cloud storage (AWS S3, Google Cloud Storage)
+- Redis for session management
+
+## Security Considerations
+
+1. **Environment Variables**: Never commit secrets to Git
+2. **Input Validation**: Sanitize all user inputs
+3. **Rate Limiting**: Implement rate limiting for API endpoints
+4. **HTTPS**: Always use HTTPS in production
+5. **Authentication**: Add user authentication if needed
+
+## Troubleshooting
+
+### Common Issues
+
+1. **WebSocket Connection Failed**
+   - Check if port 5000 is open
+   - Verify firewall settings
+   - Ensure WebSocket support in hosting environment
+
+2. **Agent Responses Not Working**
+   - Verify Ollama is running and accessible
+   - Check `OLLAMA_URL` environment variable
+   - Ensure all agent files are present and executable
+
+3. **Deployment Issues**
+   - Check build logs for dependency errors
+   - Verify Python version compatibility
+   - Ensure all required files are included
+
+### Logs
+
+- **Local Development**: Check terminal output
+- **Docker**: `docker-compose logs -f`
+- **Heroku**: `heroku logs --tail`
+- **Railway**: Check deployment logs in dashboard
 
 ## Contributing
 
@@ -87,3 +214,10 @@ The web interface integrates with the existing backend agents:
 ## License
 
 This project maintains the same license as the original Jarvis application.
+
+## Support
+
+For issues and questions:
+1. Check this README
+2. Review the troubleshooting section
+3. Open an issue on GitHub

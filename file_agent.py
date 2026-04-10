@@ -6,7 +6,7 @@ import platform
 from pathlib import Path
 import asyncio
 import re
-import subprocess
+import httpx
 sys.stdout.reconfigure(encoding='utf-8')
 
 WORKSPACE = "C:\\container\\workspace"
