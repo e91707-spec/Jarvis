@@ -9,6 +9,7 @@ import subprocess
 import glob
 import platform
 from pathlib import Path
+from groq_client import groq_client
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -225,15 +226,18 @@ async def route_request(task):
     
     print("Analyzing request...", flush=True)
     
-    async with httpx.AsyncClient(timeout=90) as client:
-        response = await client.post(OLLAMA_URL, json={
-            "model": MODEL,
-            "messages": messages,
-            "stream": False,
-            "format": "json"
-        })
-        data = response.json()
-        return data["message"]["content"]
+    async def ask_ollama(messages):
+        print("Thinking...", flush=True)
+        try:
+            response = await groq_client.chat_completion(messages, json_mode=True)
+            return response
+        except Exception as e:
+            print(f"Error using Groq API: {str(e)}", flush=True)
+            # Fallback to simple response
+            return "I'm having trouble connecting to the AI service. Please try again."
+
+    response = await ask_ollama(messages)
+    return response
 
 async def run_admin_agent(task):
     """Handle system-wide file searches by launching admin_agent.py subprocess"""

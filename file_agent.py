@@ -4,6 +4,7 @@ import subprocess
 import json
 import platform
 from pathlib import Path
+from groq_client import groq_client
 import asyncio
 import re
 import subprocess
@@ -132,15 +133,12 @@ def run_browser_task(task):
 
 async def ask_ollama(messages):
     print("Thinking...", flush=True)
-    async with httpx.AsyncClient(timeout=90) as client:
-        response = await client.post(OLLAMA_URL, json={
-            "model": MODEL,
-            "messages": messages,
-            "stream": False,
-            "format": "json"
-        })
-        data = response.json()
-        return data["message"]["content"]
+    try:
+        response = await groq_client.chat_completion(messages, json_mode=True)
+        return response
+    except Exception as e:
+        print(f"Error using Groq API: {str(e)}", flush=True)
+        return "I'm having trouble connecting to the AI service. Please try again."
 
 async def run_file_task(task):
     messages = [

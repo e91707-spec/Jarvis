@@ -4,6 +4,7 @@ import os
 import json
 import httpx
 import re
+from groq_client import groq_client
 sys.stdout.reconfigure(encoding='utf-8')
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
@@ -24,32 +25,11 @@ Introduce yourself as Jarvis when appropriate, but don't overdo it."""
 async def ask_ollama(messages):
     print("Thinking...", flush=True)
     try:
-        async with httpx.AsyncClient(timeout=120) as client:  # Increased timeout
-            response = await client.post(OLLAMA_URL, json={
-                "model": MODEL,
-                "messages": messages,
-                "stream": False,
-                "options": {
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "max_tokens": 2048  # Ensure sufficient tokens for long responses
-                }
-            })
-            response.raise_for_status()
-            data = response.json()
-            content = data.get("message", {}).get("content", "")
-            
-            # Ensure we got a response
-            if not content:
-                raise ValueError("Empty response from Ollama")
-                
-            return content
-    except httpx.TimeoutException:
-        raise Exception("Request timed out. Please try again.")
-    except httpx.HTTPStatusError as e:
-        raise Exception(f"HTTP error: {e.response.status_code}")
+        response = await groq_client.chat_completion(messages)
+        return response
     except Exception as e:
-        raise Exception(f"Ollama connection error: {str(e)}")
+        print(f"Error using Groq API: {str(e)}", flush=True)
+        return "I'm having trouble connecting to the AI service. Please try again."
 
 async def run_chat_task(task):
     messages = [
