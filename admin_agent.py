@@ -5,12 +5,9 @@ import json
 import platform
 from pathlib import Path
 from groq_client import groq_client
+from config import WORKSPACE, BASE_DIR
 
 sys.stdout.reconfigure(encoding='utf-8')
-
-WORKSPACE = "C:\\container\\workspace"
-OLLAMA_URL = "http://localhost:11434/api/chat"
-MODEL = "nous-hermes2:10.7b"
 
 SYSTEM_PROMPT = """You are Jarvis, an admin assistant that handles system-wide file searches.
 
@@ -235,7 +232,7 @@ def run_web_search(query):
         "text": True,
         "encoding": "utf-8",
         "bufsize": 1,
-        "cwd": "C:\\container"
+        "cwd": BASE_DIR
     }
     
     # Add creationflags only on Windows

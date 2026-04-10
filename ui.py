@@ -9,8 +9,7 @@ import os
 import math
 from datetime import datetime
 import platform
-
-CHATS_FILE = "C:\\container\\chats.json"
+from config import CHATS_FILE, BASE_DIR
 
 # Modern gradient-based color scheme
 BG = "#0a0a0a"
@@ -261,7 +260,7 @@ def run_task(task):
                 "stderr": subprocess.STDOUT,
                 "text": True,
                 "bufsize": 0,  # Unbuffered output
-                "cwd": "C:\\container"
+                "cwd": BASE_DIR
             }
             
             # Add creationflags only on Windows

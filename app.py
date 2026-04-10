@@ -9,13 +9,13 @@ from datetime import datetime
 import uuid
 import sys
 import platform
+from config import CHATS_FILE, BASE_DIR
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'jarvis-web-interface-secret-key'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Chat storage
-CHATS_FILE = "C:\\container\\chats.json"
 ACTIVE_SESSIONS = {}
 
 def load_chats():
@@ -40,7 +40,7 @@ def run_agent_task(task, session_id):
             "stderr": subprocess.STDOUT,
             "text": True,
             "bufsize": 0,
-            "cwd": "C:\\container"
+            "cwd": BASE_DIR
         }
         
         # Add creationflags only on Windows
