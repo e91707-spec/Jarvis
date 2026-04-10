@@ -4,10 +4,12 @@ import subprocess
 import json
 import platform
 from pathlib import Path
-from groq_client import groq_client
-from config import WORKSPACE, BASE_DIR
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+WORKSPACE = "C:\\container\\workspace"
+OLLAMA_URL = "http://localhost:11434/api/chat"
+MODEL = "nous-hermes2:10.7b"
 
 SYSTEM_PROMPT = """You are Jarvis, an admin assistant that handles system-wide file searches.
 
@@ -232,7 +234,7 @@ def run_web_search(query):
         "text": True,
         "encoding": "utf-8",
         "bufsize": 1,
-        "cwd": BASE_DIR
+        "cwd": "C:\\container"
     }
     
     # Add creationflags only on Windows
@@ -251,12 +253,15 @@ def run_web_search(query):
 
 async def ask_ollama(messages):
     print("Thinking...", flush=True)
-    try:
-        response = await groq_client.chat_completion(messages, json_mode=True)
-        return response
-    except Exception as e:
-        print(f"Error using Groq API: {str(e)}", flush=True)
-        return "I'm having trouble connecting to the AI service. Please try again."
+    async with httpx.AsyncClient(timeout=90) as client:
+        response = await client.post(OLLAMA_URL, json={
+            "model": MODEL,
+            "messages": messages,
+            "stream": False,
+            "format": "json"
+        })
+        data = response.json()
+        return data["message"]["content"]
 
 async def run_admin_task(task):
     messages = [

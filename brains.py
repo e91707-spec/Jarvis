@@ -9,10 +9,12 @@ import subprocess
 import glob
 import platform
 from pathlib import Path
-from groq_client import groq_client
-from config import WORKSPACE, CHATS_FILE
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+WORKSPACE = "C:\\container\\workspace"
+OLLAMA_URL = "http://localhost:11434/api/chat"
+MODEL = "nous-hermes2:10.7b"
 
 def create_subprocess(*args, **kwargs):
     """Cross-platform subprocess creation"""
@@ -225,13 +227,15 @@ async def route_request(task):
     
     async def ask_ollama(messages):
         print("Thinking...", flush=True)
-        try:
-            response = await groq_client.chat_completion(messages, json_mode=True)
-            return response
-        except Exception as e:
-            print(f"Error using Groq API: {str(e)}", flush=True)
-            # Fallback to simple response
-            return "I'm having trouble connecting to the AI service. Please try again."
+        async with httpx.AsyncClient(timeout=90) as client:
+            response = await client.post(OLLAMA_URL, json={
+                "model": MODEL,
+                "messages": messages,
+                "stream": False,
+                "format": "json"
+            })
+            data = response.json()
+            return data["message"]["content"]
 
     response = await ask_ollama(messages)
     return response
@@ -242,15 +246,13 @@ async def run_admin_agent(task):
 
     # Launch admin_agent.py as subprocess
     try:
-        from config import BASE_DIR
-        
         process = create_subprocess(
             ["python", "-u", "admin_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding="utf-8",
             bufsize=1,
-            cwd=BASE_DIR
+            cwd="C:\\container"
         )
         
         output_lines = []
@@ -296,15 +298,13 @@ async def run_file_agent(task):
     
     # Launch file_agent.py
     try:
-        from config import BASE_DIR
-        
         process = create_subprocess(
             ["python", "-u", "file_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding="utf-8",
             bufsize=1,
-            cwd=BASE_DIR
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
@@ -320,15 +320,13 @@ async def run_browser_agent(task):
     
     # Launch browser_agent.py
     try:
-        from config import BASE_DIR
-        
         process = create_subprocess(
             ["python", "-u", "ai_browser_native.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding="utf-8",
             bufsize=1,
-            cwd=BASE_DIR
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
@@ -344,15 +342,13 @@ async def run_chat_agent(task):
     
     # Launch chat_agent.py
     try:
-        from config import BASE_DIR
-        
         process = create_subprocess(
             ["python", "-u", "chat_agent.py", task],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding="utf-8",
             bufsize=1,
-            cwd=BASE_DIR
+            cwd="C:\\container"
         )
         for line in process.stdout:
             line = line.strip()
