@@ -4,12 +4,12 @@ A modern web-based AI assistant interface that replaces the original Tkinter UI 
 
 ## Features
 
-- 🌐 **Web-based Interface**: Access from any device with a browser
-- 💬 **Real-time Chat**: WebSocket-powered streaming responses
-- 🎨 **Modern UI**: Dark theme matching the original design
-- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
-- 💾 **Chat Persistence**: Saves conversations across sessions
-- 🔍 **Agent Integration**: Full compatibility with existing backend agents
+- **Web-based Interface**: Access from any device with a browser
+- **Real-time Chat**: WebSocket-powered streaming responses
+- **Modern UI**: Dark theme matching the original design
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Chat Persistence**: Saves conversations across sessions
+- **Agent Integration**: Full compatibility with existing backend agents
 
 ## Quick Start
 
@@ -17,8 +17,8 @@ A modern web-based AI assistant interface that replaces the original Tkinter UI 
 
 1. **Clone and Setup**
    ```bash
-   git clone <your-repo-url>
-   cd jarvis-web
+   git clone https://github.com/e91707-spec/Jarvis.git
+   cd Jarvis
    ```
 
 2. **Install Dependencies**
@@ -50,7 +50,30 @@ A modern web-based AI assistant interface that replaces the original Tkinter UI 
 
 ## Deployment Options
 
-### 1. Heroku (Easiest)
+### 1. Railway (Easiest - Free)
+
+1. **Connect GitHub Repo**
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your "Jarvis" repository
+
+2. **Configure**
+   - Railway will automatically detect Dockerfile
+   - Set environment variables if needed
+
+### 2. Render (Free)
+
+1. **Create Web Service**
+   - Go to [render.com](https://render.com)
+   - Click "New" → "Web Service"
+   - Connect your GitHub repository
+
+2. **Configure**
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app`
+   - Instance Type: Free
+
+### 3. Heroku (Free)
 
 1. **Create Heroku App**
    ```bash
@@ -65,28 +88,6 @@ A modern web-based AI assistant interface that replaces the original Tkinter UI 
 3. **Access**
    Your app will be available at `https://your-app-name.herokuapp.com`
 
-### 2. Railway
-
-1. **Connect GitHub Repo**
-   - Go to [railway.app](https://railway.app)
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Select your repository
-
-2. **Configure**
-   - Railway will automatically detect the Dockerfile
-   - Set environment variables if needed
-
-### 3. Render
-
-1. **Create Web Service**
-   - Go to [render.com](https://render.com)
-   - Click "New" → "Web Service"
-   - Connect your GitHub repository
-
-2. **Configure**
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT app:app`
-
 ### 4. VPS/Dedicated Server
 
 1. **Install Docker**
@@ -97,8 +98,8 @@ A modern web-based AI assistant interface that replaces the original Tkinter UI 
 
 2. **Deploy**
    ```bash
-   git clone <your-repo-url>
-   cd jarvis-web
+   git clone https://github.com/e91707-spec/Jarvis.git
+   cd Jarvis
    docker-compose up -d
    ```
 
@@ -119,7 +120,7 @@ MODEL=nous-hermes2:10.7b
 ## File Structure
 
 ```
-jarvis-web/
+Jarvis/
 ├── app.py                 # Main Flask application
 ├── templates/
 │   └── index.html         # Main HTML template
@@ -130,7 +131,7 @@ jarvis-web/
 │       └── app.js         # Frontend JavaScript
 ├── brains.py              # AI routing logic
 ├── admin_agent.py         # System file operations
-├── file_agent.py          # Workspace file operations
+├── file_agent.py          # Workspace file operations  
 ├── ai_browser_native.py   # Web search functionality
 ├── chat_agent.py          # General conversation
 ├── requirements.txt       # Python dependencies
