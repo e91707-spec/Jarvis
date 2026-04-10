@@ -275,8 +275,14 @@ class JarvisWebApp {
             const messageText = streamingMessage.querySelector('.message-text');
             
             if (data.type === 'stream') {
-                // Update streaming text
-                messageText.textContent += data.message + '\n';
+                // Update streaming text - ensure we don't duplicate content
+                const currentText = messageText.textContent || '';
+                const newMessage = data.message;
+                
+                // Only append if the new message isn't already at the end
+                if (!currentText.endsWith(newMessage)) {
+                    messageText.textContent = currentText + newMessage + '\n';
+                }
             } else if (data.type === 'complete') {
                 // Finalize the message
                 streamingMessage.classList.remove('streaming');

@@ -549,14 +549,18 @@ def update_agent_bubble(text):
     print(f"DEBUG: update_agent_bubble called with text: {text[:100]}...", flush=True)
     if current_agent_label[0]:
         print("DEBUG: current_agent_label exists, updating text", flush=True)
-        # Clear existing text and insert new text
-        current_agent_label[0].delete("1.0", tk.END)
-        current_agent_label[0].insert("1.0", text)
-        current_agent_label[0].config(fg=TEXT)
+        # Get current content and append new text
+        current_content = current_agent_label[0].get("1.0", tk.END).strip()
         
-        # Adjust dimensions based on content
-        width, height = calculate_text_dimensions(text, FONT_MONO)
-        current_agent_label[0].config(width=width, height=height)
+        # Only append if the new text is different from current content
+        if text != current_content:
+            current_agent_label[0].delete("1.0", tk.END)
+            current_agent_label[0].insert("1.0", text)
+            current_agent_label[0].config(fg=TEXT)
+            
+            # Adjust dimensions based on content
+            width, height = calculate_text_dimensions(text, FONT_MONO)
+            current_agent_label[0].config(width=width, height=height)
         
         print("DEBUG: Text updated successfully", flush=True)
     else:
