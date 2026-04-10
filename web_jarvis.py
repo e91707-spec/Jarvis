@@ -4,10 +4,54 @@ import json
 import os
 import threading
 import asyncio
+import httpx
 from datetime import datetime
 import uuid
 import sys
-from groq_client import groq_client
+
+# Standalone Groq Client (no external imports)
+class GroqClient:
+    def __init__(self):
+        self.api_key = os.getenv("GROQ_API_KEY")
+        self.base_url = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+        self.model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+        
+        if not self.api_key:
+            raise ValueError("GROQ_API_KEY environment variable is required")
+    
+    async def chat_completion(self, messages, stream=False, json_mode=False):
+        """Send chat completion request to Groq API"""
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "stream": stream
+        }
+        
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
+        
+        async with httpx.AsyncClient(timeout=90) as client:
+            response = await client.post(
+                f"{self.base_url}/chat/completions",
+                headers=headers,
+                json=payload
+            )
+            
+            if response.status_code != 200:
+                error_msg = f"Groq API error: {response.status_code} - {response.text}"
+                print(error_msg, flush=True)
+                raise Exception(error_msg)
+            
+            data = response.json()
+            return data["choices"][0]["message"]["content"]
+
+# Global Groq client instance
+groq_client = GroqClient()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'jarvis-web-interface-secret-key'
