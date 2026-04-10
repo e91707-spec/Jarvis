@@ -1,0 +1,22 @@
+services:
+  # Web Service
+  - type: web
+    name: jarvis-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 app:app
+    autoDeploy: true
+    
+  # Background Worker for AI tasks
+  - type: worker
+    name: jarvis-worker
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    autoDeploy: true
+
+databases:
+  # SQLite is used locally, no external DB needed for free tier
+  - name: jarvis-db
